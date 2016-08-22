@@ -756,12 +756,8 @@ module.exports = function(User) {
 
     UserModel.validatesFormatOf('email', { with: re, message: g.f('Must provide a valid email') });
 
-    // Non-realm users validation
-    if (!(UserModel.settings.realmRequired || UserModel.settings.realmDelimiter)) {
-      UserModel.validatesUniquenessOf('email', { message: 'Email already exists' });
-      UserModel.validatesUniquenessOf('username', { message: 'User already exists' });
-    } else {
-      // Realm users validation
+    // Realm users validation
+    if (UserModel.settings.realmRequired || UserModel.settings.realmDelimiter) {
       UserModel.validatesUniquenessOf('email', {
         message: 'Email already exists',
         scopedTo: ['realm'],
@@ -770,6 +766,10 @@ module.exports = function(User) {
         message: 'User already exists',
         scopedTo: ['realm'],
       });
+    } else {
+      // Regular(Non-realm) users validation
+      UserModel.validatesUniquenessOf('email', { message: 'Email already exists' });
+      UserModel.validatesUniquenessOf('username', { message: 'User already exists' });
     }
 
     return UserModel;
