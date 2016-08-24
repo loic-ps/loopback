@@ -355,17 +355,21 @@ module.exports = function(Role) {
           roleMappingModel.findOne({ where: { roleId: roleId,
               principalType: principalType, principalId: principalId }},
             function(err, result) {
-              debug('Role mapping found: %j', result);
-              done(!err && result); // The only arg is the result
+              if (!err) {
+                debug('Role mapping found: %j', result);
+              }
+              done(err, result);
             });
         } else {
           process.nextTick(function() {
-            done(false);
+            done(null, false);
           });
         }
-      }, function(inRole) {
-        debug('isInRole() returns: %j', inRole);
-        if (callback) callback(null, inRole);
+      }, function(err, inRole) {
+        if (!err) {
+          debug('isInRole() returns: %j', inRole);
+        }
+        if (callback) callback(err, inRole);
       });
     });
   };

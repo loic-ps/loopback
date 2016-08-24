@@ -210,9 +210,7 @@ describe('role model', function() {
                 { principalType: RoleMapping.USER, principalId: user.id },
                 function(err, inRole) {
                   if (err) return next(err);
-                  // NOTE(bajtos) Apparently isRole is not a boolean,
-                  // but the matchin role object instead
-                  assert(!!inRole);
+                  assert(inRole === true)
                   next();
                 });
             },
@@ -222,7 +220,7 @@ describe('role model', function() {
                 { principalType: RoleMapping.APP, principalId: user.id },
                 function(err, inRole) {
                   if (err) return next(err);
-                  assert(!inRole);
+                  assert(inRole === false);
                   next();
                 });
             },
@@ -232,7 +230,7 @@ describe('role model', function() {
                 { principalType: RoleMapping.USER, principalId: 100 },
                 function(err, inRole) {
                   if (err) return next(err);
-                  assert(!inRole);
+                  assert(inRole === false);
                   next();
                 });
             },
@@ -321,9 +319,9 @@ describe('role model', function() {
           Role.isInRole(
             'returnPromise',
             { principalType: ACL.USER, principalId: user.id },
-            function(err, yes) {
+            function(err, inRole) {
               if (err) return next(err);
-              assert(yes);
+              assert(inRole === true);
               next();
             });
         },
@@ -331,9 +329,9 @@ describe('role model', function() {
           Role.isInRole(
             Role.AUTHENTICATED,
             { principalType: ACL.USER, principalId: user.id },
-            function(err, yes) {
+            function(err, inRole) {
               if (err) next(err);
-              assert(yes);
+              assert(inRole === true);
               next();
             });
         },
@@ -341,9 +339,9 @@ describe('role model', function() {
           Role.isInRole(
             Role.AUTHENTICATED,
             { principalType: ACL.USER, principalId: null },
-            function(err, yes) {
+            function(err, inRole) {
               if (err) next(err);
-              assert(!yes);
+              assert(inRole === false);
               next();
             });
         },
@@ -351,9 +349,9 @@ describe('role model', function() {
           Role.isInRole(
             Role.UNAUTHENTICATED,
             { principalType: ACL.USER, principalId: user.id },
-            function(err, yes) {
+            function(err, inRole) {
               if (err) return next(err);
-              assert(!yes);
+              assert(inRole === false);
               next();
             });
         },
@@ -361,9 +359,9 @@ describe('role model', function() {
           Role.isInRole(
             Role.UNAUTHENTICATED,
             { principalType: ACL.USER, principalId: null },
-            function(err, yes) {
+            function(err, inRole) {
               if (err) return next(err);
-              assert(yes);
+              assert(inRole === true);
               next();
             });
         },
@@ -371,9 +369,9 @@ describe('role model', function() {
           Role.isInRole(
             Role.EVERYONE,
             { principalType: ACL.USER, principalId: user.id },
-            function(err, yes) {
+            function(err, inRole) {
               if (err) return next(err);
-              assert(yes);
+              assert(inRole === true);
               next();
             });
         },
@@ -381,9 +379,9 @@ describe('role model', function() {
           Role.isInRole(
             Role.EVERYONE,
             { principalType: ACL.USER, principalId: null },
-            function(err, yes) {
+            function(err, inRole) {
               if (err) return next(err);
-              assert(yes);
+              assert(inRole === true);
               next();
             });
         },
@@ -394,9 +392,9 @@ describe('role model', function() {
               principalType: ACL.USER, principalId: user.id,
               model: Album, id: album1.id,
             };
-            Role.isInRole(Role.OWNER, role, function(err, yes) {
+            Role.isInRole(Role.OWNER, role, function(err, inRole) {
               if (err) return next(err);
-              assert(yes);
+              assert(inRole === true);
 
               Album.create({ name: 'Album 2' }, function(err, album2) {
                 if (err) return next(err);
@@ -404,9 +402,9 @@ describe('role model', function() {
                   principalType: ACL.USER, principalId: user.id,
                   model: Album, id: album2.id,
                 };
-                Role.isInRole(Role.OWNER, role, function(err, yes) {
+                Role.isInRole(Role.OWNER, role, function(err, inRole) {
                   if (err) return next(err);
-                  assert(!yes);
+                  assert(inRole === false);
                   next();
                 });
               });
